@@ -29,6 +29,25 @@ MenuState::MenuState(StateMachine& machine, sf::RenderWindow& window, bool repla
 		m_playSprite.setScale(0.1, 0.1);
 		m_playSprite.setPosition(50.f, 50.f);
 	}
+
+	if(!m_menuFont.loadFromFile("assets/arial.ttf"))
+	{
+		std::cout << "\"assets/arial.ttf\" is not exsist\n";
+	}
+
+	m_exitButton.setSize(sf::Vector2f(200.f, 50.f));
+	m_exitButton.setOrigin(m_exitButton.getSize().x / 2, m_exitButton.getSize().y / 2);
+	m_exitButton.setPosition(m_window.getSize().x / 2, m_window.getSize().y / 2);
+	m_exitButton.setFillColor(sf::Color::White);
+	m_exitButton.setOutlineThickness(5.f);
+	m_exitButton.setOutlineColor(sf::Color::Red);
+
+	m_exitText.setFont(m_menuFont);
+	m_exitText.setString("SAVE AND EXIT");
+	m_exitText.setCharacterSize(20);
+	m_exitText.setOrigin(m_exitText.getGlobalBounds().width / 2, m_exitText.getGlobalBounds().height / 2);
+	m_exitText.setPosition(m_exitButton.getPosition());
+	m_exitText.setFillColor(sf::Color::Black);
 }
 
 void MenuState::pause()
@@ -75,6 +94,10 @@ void MenuState::draw()
 	m_window.draw(m_mainbgSprite);
 
 	m_window.draw(m_playSprite);
+
+	m_window.draw(m_exitButton);
+
+	m_window.draw(m_exitText);
 
 	m_window.display();
 }

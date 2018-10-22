@@ -35,7 +35,7 @@ PlayState::PlayState(StateMachine& machine, sf::RenderWindow& window, bool repla
 
 	if (!m_resetText.loadFromFile("assets/resetbutton.png"))
 	{
-		std::cout << "\"assets / resetebutton.png\" is not exsist\n";
+		std::cout << "\"assets/resetebutton.png\" is not exsist\n";
 	}
 	else
 	{

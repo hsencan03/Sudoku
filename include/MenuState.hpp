@@ -4,6 +4,7 @@
 #include "PlayState.hpp"
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 
 
 class MenuState : public State {
@@ -22,4 +23,9 @@ private:
 
 	sf::Texture m_playText;
 	sf::Sprite m_playSprite;
+
+	sf::Font m_menuFont;
+
+	sf::RectangleShape m_exitButton;
+	sf::Text m_exitText;
 };
