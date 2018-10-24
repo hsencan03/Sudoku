@@ -26,7 +26,7 @@ MenuState::MenuState(StateMachine& machine, sf::RenderWindow& window, bool repla
 	{
 		m_playSprite.setTexture(m_playText);
 		m_playSprite.setOrigin(m_playText.getSize().x / 2, m_playText.getSize().y / 2);
-		m_playSprite.setScale(0.1, 0.1);
+		m_playSprite.setScale(0.1f, 0.1f);
 		m_playSprite.setPosition(50.f, 50.f);
 	}
 
@@ -74,6 +74,11 @@ void MenuState::update()
 
 			if (m_playSprite.getGlobalBounds().contains(worldPos))
 				m_machine.lastState();
+			if(m_exitButton.getGlobalBounds().contains(worldPos))
+			{
+				Cell::Serialization(m_machine.m_cells.get(), "hsencan");
+	//			m_machine.quit();
+			}
 		}
 		else if (event.type == sf::Event::KeyPressed)
 		{

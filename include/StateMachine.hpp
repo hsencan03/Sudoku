@@ -4,6 +4,8 @@
 #include <stack>
 #include <string>
 
+#include "Cell.hpp"
+
 class State;
 
 namespace sf
@@ -28,6 +30,8 @@ public:
 
 	template <typename T>
 	static std::unique_ptr<T> build(StateMachine& machine, sf::RenderWindow& window, bool replace = true);
+
+	std::unique_ptr<Cell> m_cells;
 
 private:
 	std::stack<std::unique_ptr<State>> m_states;

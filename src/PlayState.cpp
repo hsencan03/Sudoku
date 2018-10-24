@@ -29,7 +29,7 @@ PlayState::PlayState(StateMachine& machine, sf::RenderWindow& window, bool repla
 	{
 		m_pauseSprite.setTexture(m_pauseText);
 		m_pauseSprite.setOrigin(m_pauseText.getSize().x / 2, m_pauseText.getSize().y / 2);
-		m_pauseSprite.setScale(0.1, 0.1);
+		m_pauseSprite.setScale(0.1f, 0.1f);
 		m_pauseSprite.setPosition(50.f, 50.f);
 	}
 
@@ -41,17 +41,17 @@ PlayState::PlayState(StateMachine& machine, sf::RenderWindow& window, bool repla
 	{
 		m_resetSprite.setTexture(m_resetText);
 		m_resetSprite.setOrigin(m_resetText.getSize().x / 2, m_resetText.getSize().y / 2);
-		m_resetSprite.setScale(0.03, 0.03);
+		m_resetSprite.setScale(0.03f, 0.03f);
 		m_resetSprite.setPosition(m_window.getSize().x - 50.0f, 50.f);
 	}
 
-	cells = std::unique_ptr<Cell>(new Cell[ROW * COL]);
+	m_machine.m_cells = std::unique_ptr<Cell>(new Cell[ROW * COL]);
 
 	for (int x = 0; x < ROW; x++)
 	{
 		for (int y = 0; y < COL; y++)
 		{
-			auto& cell = cells.get()[y * ROW + x];
+			auto& cell = m_machine.m_cells.get()[y * ROW + x];
 
 			cell.shape.setSize(sf::Vector2f(m_window.getSize().x / 15, m_window.getSize().y / 15));
 			cell.shape.setOrigin(sf::Vector2f(cell.shape.getSize().x / 2, cell.shape.getSize().y / 2));
@@ -117,14 +117,14 @@ void PlayState::update()
 			{
 				for (int y = 0; y < COL; y++)
 				{
-					if (cells.get()[y * ROW + x].shape.getGlobalBounds().contains(worldPos))
+					if (m_machine.m_cells.get()[y * ROW + x].shape.getGlobalBounds().contains(worldPos))
 					{
-						int value = cells.get()[y * ROW + x].num;
+						int value = m_machine.m_cells.get()[y * ROW + x].num;
 
 						if (++value == 10)
 							value = 0;
-						cells.get()[y * ROW + x].num = value;
-						cells.get()[y * ROW + x].text.setString(std::to_string(value));
+						m_machine.m_cells.get()[y * ROW + x].num = value;
+						m_machine.m_cells.get()[y * ROW + x].text.setString(std::to_string(value));
 						solver.set(x, y, value);
 
 						//THREADING
@@ -143,7 +143,7 @@ void PlayState::update()
 						{
 							std::cout << "\ntrue";
 							for (int i = 0; i < ROW * COL; i++)
-								cells.get()[i].text.setFillColor(sf::Color::Black);
+								m_machine.m_cells.get()[i].text.setFillColor(sf::Color::Black);
 						}
 						else
 						{
@@ -165,8 +165,8 @@ void PlayState::draw()
 
 	for (int i = 0; i < ROW * COL; i++)
 	{
-		m_window.draw(cells.get()[i].shape);
-		m_window.draw(cells.get()[i].text);
+		m_window.draw(m_machine.m_cells.get()[i].shape);
+		m_window.draw(m_machine.m_cells.get()[i].text);
 	}
 
 	m_window.draw(m_pauseSprite);
@@ -180,9 +180,9 @@ void PlayState::reset()
 {
 	for (int i = 0; i < ROW * COL; i++)
 	{
-		cells.get()[i].num = 0;
-		cells.get()[i].text.setString("0");
-		cells.get()[i].text.setFillColor(sf::Color::Black);
+		m_machine.m_cells.get()[i].num = 0;
+		m_machine.m_cells.get()[i].text.setString("0");
+		m_machine.m_cells.get()[i].text.setFillColor(sf::Color::Black);
 	}
 
 	solver = SudokuSolver();
@@ -198,27 +198,27 @@ void PlayState::setColorOfMistakes(int row, int column, sf::Color color)
 	{
 		for (int y = 0; y < COL / 3; y++)
 		{
-			nums.insert(std::make_pair(cells.get()[(column - column % 3 + y) * ROW + (row - row % 3 + x)].num, std::make_pair((row - row % 3 + x), (column - column % 3 + y))));
+			nums.insert(std::make_pair(m_machine.m_cells.get()[(column - column % 3 + y) * ROW + (row - row % 3 + x)].num, std::make_pair((row - row % 3 + x), (column - column % 3 + y))));
 		}
 	}
 
 	for (int x = 0; x < ROW; x++)
 	{
-		if (nums.find(cells.get()[column * ROW + x].num) != nums.end() && nums.find(cells.get()[column * ROW + x].num)->second != std::make_pair(x, column))
-			nums.insert(std::make_pair(cells.get()[column * ROW + x].num, std::make_pair(x, column)));
+		if (nums.find(m_machine.m_cells.get()[column * ROW + x].num) != nums.end() && nums.find(m_machine.m_cells.get()[column * ROW + x].num)->second != std::make_pair(x, column))
+			nums.insert(std::make_pair(m_machine.m_cells.get()[column * ROW + x].num, std::make_pair(x, column)));
 	}
 
 	for (int y = 0; y < COL; y++)
 	{
-		if(nums.find(cells.get()[y * ROW + row].num) != nums.end() && nums.find(cells.get()[y * ROW + row].num)->second != std::make_pair(row, y))
-			nums.insert(std::make_pair(cells.get()[y * ROW + row].num, std::make_pair(row, y)));
+		if(nums.find(m_machine.m_cells.get()[y * ROW + row].num) != nums.end() && nums.find(m_machine.m_cells.get()[y * ROW + row].num)->second != std::make_pair(row, y))
+			nums.insert(std::make_pair(m_machine.m_cells.get()[y * ROW + row].num, std::make_pair(row, y)));
 	}
 
 	for(auto i = nums.begin(); i != nums.end(); i++)
 	{
 		if (i->first != 0 && nums.count(i->first) > 1)
-			cells.get()[i->second.second * ROW + i->second.first].text.setFillColor(color);
+			m_machine.m_cells.get()[i->second.second * ROW + i->second.first].text.setFillColor(color);
 		else
-			cells.get()[i->second.second * ROW + i->second.first].text.setFillColor(sf::Color::Black);
+			m_machine.m_cells.get()[i->second.second * ROW + i->second.first].text.setFillColor(sf::Color::Black);
 	} 
 }

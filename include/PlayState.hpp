@@ -2,9 +2,9 @@
 
 #include "State.hpp"
 #include "SudokuSolver.hpp"
-#include "Cell.hpp"
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
 
 class PlayState : public State {
 public:
@@ -22,7 +22,6 @@ private:
 	void setColorOfMistakes(int row, int col, sf::Color color);
 
 private:
-	std::unique_ptr<Cell> cells;
 	SudokuSolver solver;
 
 	sf::Texture m_mainbgText;
