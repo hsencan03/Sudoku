@@ -77,7 +77,7 @@ void MenuState::update()
 			if(m_exitButton.getGlobalBounds().contains(worldPos))
 			{
 				Cell::Serialization(m_machine.m_cells.get(), "hsencan");
-	//			m_machine.quit();
+				m_machine.quit();
 			}
 		}
 		else if (event.type == sf::Event::KeyPressed)

@@ -1,7 +1,6 @@
 #include "StateMachine.hpp"
 #include "State.hpp"
 
-#include <iostream>
 #include <memory>
 
 StateMachine::StateMachine()

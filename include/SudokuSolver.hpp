@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <future>
+
 enum
 {
 	UNASSIGNED = 0,

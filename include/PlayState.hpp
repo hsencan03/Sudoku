@@ -32,4 +32,6 @@ private:
 
 	sf::Texture m_resetText;
 	sf::Sprite m_resetSprite;
+
+	bool m_loadedFromFile;
 };

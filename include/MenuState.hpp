@@ -1,7 +1,6 @@
 #pragma once
 
 #include "State.hpp"
-#include "PlayState.hpp"
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>

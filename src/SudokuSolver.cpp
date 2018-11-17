@@ -77,11 +77,9 @@ bool SudokuSolver::solve()
 
 	for (int i = 1; i <= 9; i++)
 	{
-		int num = std::rand() % 9 + 1;
-
-		if (isSafe(cell.first, cell.second, num))
+		if (isSafe(cell.first, cell.second, i))
 		{
-			m_temp[cell.second * ROW + cell.first] = num;
+			m_temp[cell.second * ROW + cell.first] = i;
 
 			if (solve())
 				return true;

@@ -10,7 +10,7 @@
 #include <unordered_map>
 
 PlayState::PlayState(StateMachine& machine, sf::RenderWindow& window, bool replace)
-	: State(machine, window, replace)
+	: State(machine, window, replace), m_loadedFromFile{false}
 {
 	if(!m_mainbgText.loadFromFile("assets/mainbg.png"))
 	{
@@ -28,7 +28,7 @@ PlayState::PlayState(StateMachine& machine, sf::RenderWindow& window, bool repla
 	else
 	{
 		m_pauseSprite.setTexture(m_pauseText);
-		m_pauseSprite.setOrigin(m_pauseText.getSize().x / 2, m_pauseText.getSize().y / 2);
+		m_pauseSprite.setOrigin(m_pauseText.getSize().x >> 1, m_pauseText.getSize().y >> 1);
 		m_pauseSprite.setScale(0.1f, 0.1f);
 		m_pauseSprite.setPosition(50.f, 50.f);
 	}
@@ -45,7 +45,12 @@ PlayState::PlayState(StateMachine& machine, sf::RenderWindow& window, bool repla
 		m_resetSprite.setPosition(m_window.getSize().x - 50.0f, 50.f);
 	}
 
-	m_machine.m_cells = std::unique_ptr<Cell>(new Cell[ROW * COL]);
+	m_machine.m_cells = std::unique_ptr<Cell>(std::move(Cell::Deserialization("hsencan")));
+
+	if (m_machine.m_cells == nullptr)
+		m_machine.m_cells = std::unique_ptr<Cell>(new Cell[ROW * COL]);
+	else
+		m_loadedFromFile = true;
 
 	for (int x = 0; x < ROW; x++)
 	{
@@ -67,11 +72,14 @@ PlayState::PlayState(StateMachine& machine, sf::RenderWindow& window, bool repla
 
 			cell.font.loadFromFile("assets/arial.ttf");
 
-			cell.text = sf::Text("0", cell.font);
+			cell.text = sf::Text(std::to_string(cell.num), cell.font);
 			cell.text.setCharacterSize(15);
 			cell.text.setPosition(cell.shape.getPosition());
-			cell.text.setOrigin(cell.text.getCharacterSize() / 2, cell.text.getCharacterSize() / 2);
+			cell.text.setOrigin(cell.text.getCharacterSize() >> 1, cell.text.getCharacterSize() >> 1);
 			cell.text.setFillColor(sf::Color::Black);
+
+			if (m_loadedFromFile)
+				setColorOfMistakes(x, y, sf::Color::Red);
 		}
 	}
 }
@@ -128,7 +136,7 @@ void PlayState::update()
 						solver.set(x, y, value);
 
 						//THREADING
-						std::thread([&]()
+						std::thread([&]
 						{
 							solver.Solve();
 						}).detach();
