@@ -1,7 +1,6 @@
 #pragma once
 
 #include <utility>
-#include <future>
 
 enum
 {
@@ -14,15 +13,11 @@ class SudokuSolver {
 public:
 	SudokuSolver();
 
-	void Solve();
-
-	void stop();
+	bool Solve();
 	
 	void set(int row, int column, int num);
 
 	int get(int row, int column) const;
-
-	bool getStatus() const;
 
 	void print();
 
@@ -36,8 +31,6 @@ private:
 	int grid[ROW * COL];
 	int m_temp[ROW * COL];
 
-	bool m_status;
-
-	std::promise<void> m_exit;
-	std::future<void> m_future;
+	//TODO FIND BETTER SOLUTION
+	int m_solveCount;
 };

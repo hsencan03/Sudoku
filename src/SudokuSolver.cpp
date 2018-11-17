@@ -3,7 +3,7 @@
 #include <iostream>
 #include <ctime>
 
-SudokuSolver::SudokuSolver() : m_future(m_exit.get_future()), m_status(false)
+SudokuSolver::SudokuSolver()
 {
 	for (int i = 0; i < ROW * COL; i++)
 		grid[i] = UNASSIGNED;
@@ -11,21 +11,10 @@ SudokuSolver::SudokuSolver() : m_future(m_exit.get_future()), m_status(false)
 	std::srand(std::time(nullptr));
 }
 
-void SudokuSolver::Solve()
+bool SudokuSolver::Solve()
 {
-	m_status = false;
-	if (m_future.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
-	{
-		if (solve())
-			m_status = true;
-	}
-}
-
-void SudokuSolver::stop()
-{
-	m_exit.set_value();
-	m_exit = std::promise<void>();
-	m_future = m_exit.get_future();
+	m_solveCount = 0;
+	return solve();
 }
 
 void SudokuSolver::set(int row, int column, int num)
@@ -39,11 +28,6 @@ void SudokuSolver::set(int row, int column, int num)
 int SudokuSolver::get(int row, int column) const
 {
 	return grid[column * ROW + row];
-}
-
-bool SudokuSolver::getStatus() const
-{
-	return m_status;
 }
 
 void SudokuSolver::print()
@@ -70,6 +54,9 @@ void SudokuSolver::print()
 
 bool SudokuSolver::solve()
 {
+	if (++m_solveCount > 10000)
+		return false;
+
 	std::pair<int, int> cell = FindUnassignedCell();
 
 	if (cell.first == -1)

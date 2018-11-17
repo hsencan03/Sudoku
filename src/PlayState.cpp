@@ -6,7 +6,7 @@
 #include <SFML/Window/Event.hpp>
 
 #include <iostream>
-#include <thread>
+#include <future>
 #include <unordered_map>
 
 PlayState::PlayState(StateMachine& machine, sf::RenderWindow& window, bool replace)
@@ -136,18 +136,12 @@ void PlayState::update()
 						solver.set(x, y, value);
 
 						//THREADING
-						std::thread([&]
-						{
-							solver.Solve();
-						}).detach();
-
-
-						std::this_thread::sleep_for(std::chrono::milliseconds(50));
-						solver.stop();							
+						auto result = std::async(std::launch::async, [&]() { return solver.Solve(); });
 
 						//Print
 						solver.print();
-						if (solver.getStatus())
+						//TODO FIX HERE
+						if (result.get())
 						{
 							std::cout << "\ntrue";
 							for (int i = 0; i < ROW * COL; i++)
