@@ -10,7 +10,7 @@
 #include <unordered_map>
 
 PlayState::PlayState(StateMachine& machine, sf::RenderWindow& window, bool replace)
-	: State(machine, window, replace), m_loadedFromFile{ false }
+	: State(machine, window, replace), m_loadedFromFile{ false }, m_done{false}
 {
 	if (!m_mainbgText.loadFromFile("assets/mainbg.png"))
 	{
@@ -79,7 +79,10 @@ PlayState::PlayState(StateMachine& machine, sf::RenderWindow& window, bool repla
 			cell.text.setFillColor(sf::Color::Black);
 
 			if (m_loadedFromFile)
+			{
+				solver.set(x, y, cell.num);
 				setColorOfMistakes(x, y, sf::Color::Red);
+			}
 		}
 	}
 }
@@ -106,6 +109,9 @@ void PlayState::update()
 			case sf::Keyboard::Escape:
 				m_next = StateMachine::build<MenuState>(m_machine, m_window, false);
 				break;
+			case sf::Keyboard::S:
+				solve();
+				break;
 			default:
 				break;
 			}
@@ -120,7 +126,8 @@ void PlayState::update()
 				m_next = StateMachine::build<MenuState>(m_machine, m_window, false);
 			else if (m_resetSprite.getGlobalBounds().contains(worldPos))
 				reset();
-
+			if (m_done)
+				return;
 			for (int x = 0; x < ROW; x++)
 			{
 				for (int y = 0; y < COL; y++)
@@ -146,6 +153,8 @@ void PlayState::update()
 							std::cout << "\ntrue";
 							for (int i = 0; i < ROW * COL; i++)
 								m_machine.m_cells.get()[i].text.setFillColor(sf::Color::Black);
+
+							m_mistakes.clear();
 						}
 						else
 						{
@@ -189,6 +198,7 @@ void PlayState::reset()
 
 	solver = SudokuSolver();
 	solver.print();
+	m_done = false;
 }
 
 
@@ -219,8 +229,35 @@ void PlayState::setColorOfMistakes(int row, int column, sf::Color color)
 	for (auto i = nums.begin(); i != nums.end(); i++)
 	{
 		if (i->first != 0 && nums.count(i->first) > 1)
+		{
 			m_machine.m_cells.get()[i->second.second * ROW + i->second.first].text.setFillColor(color);
+			m_mistakes.insert(std::make_pair(i->second.first, i->second.second));
+		}
 		else
+		{
+			m_mistakes.erase(std::make_pair(i->second.first, i->second.second));
 			m_machine.m_cells.get()[i->second.second * ROW + i->second.first].text.setFillColor(sf::Color::Black);
+		}
 	}
+}
+
+void PlayState::solve()
+{
+	for(auto& i : m_mistakes)
+	{
+		m_machine.m_cells.get()[i.second * ROW + i.first].num = 0;
+		solver.set(i.first, i.second, 0);
+	}
+	solver.Solve();
+
+	int* cell = solver.getSolvedCell();
+
+	for (int i = 0; i < ROW * COL; i++)
+	{
+		m_machine.m_cells.get()[i].num = cell[i];
+		m_machine.m_cells.get()[i].text.setString(std::to_string(cell[i]));
+		m_machine.m_cells.get()[i].text.setFillColor(sf::Color::Black);
+	}
+
+	m_done = true;
 }

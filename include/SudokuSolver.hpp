@@ -1,5 +1,4 @@
 #pragma once
-
 #include <utility>
 
 enum
@@ -14,10 +13,12 @@ public:
 	SudokuSolver();
 
 	bool Solve();
-	
+
 	void set(int row, int column, int num);
 
 	int get(int row, int column) const;
+
+	int* getSolvedCell();
 
 	void print();
 

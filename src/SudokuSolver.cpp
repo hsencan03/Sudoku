@@ -6,7 +6,10 @@
 SudokuSolver::SudokuSolver()
 {
 	for (int i = 0; i < ROW * COL; i++)
+	{
 		grid[i] = UNASSIGNED;
+		m_temp[i] = UNASSIGNED;
+	}
 
 	std::srand(std::time(nullptr));
 }
@@ -28,6 +31,11 @@ void SudokuSolver::set(int row, int column, int num)
 int SudokuSolver::get(int row, int column) const
 {
 	return grid[column * ROW + row];
+}
+
+int* SudokuSolver::getSolvedCell()
+{
+	return m_temp;
 }
 
 void SudokuSolver::print()
@@ -62,11 +70,13 @@ bool SudokuSolver::solve()
 	if (cell.first == -1)
 		return true;
 
-	for (int i = 1; i <= 9; i++)
+	for (int i = 0; i < 9; i++)
 	{
-		if (isSafe(cell.first, cell.second, i))
+		int num = std::rand() % 9 + 1;
+
+		if (isSafe(cell.first, cell.second, num))
 		{
-			m_temp[cell.second * ROW + cell.first] = i;
+			m_temp[cell.second * ROW + cell.first] = num;
 
 			if (solve())
 				return true;
@@ -76,6 +86,7 @@ bool SudokuSolver::solve()
 	}
 	return false;
 }
+
 
 bool SudokuSolver::isSafe(int row, int column, int num)
 {
@@ -104,7 +115,7 @@ bool SudokuSolver::isSafe(int row, int column, int num)
 	return true;
 }
 
-std::pair<int,int> SudokuSolver::FindUnassignedCell()
+std::pair<int, int> SudokuSolver::FindUnassignedCell()
 {
 	for (int x = 0; x < ROW; x++)
 	{

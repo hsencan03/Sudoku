@@ -5,6 +5,7 @@
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <set>
 
 class PlayState : public State {
 public:
@@ -21,6 +22,8 @@ private:
 
 	void setColorOfMistakes(int row, int col, sf::Color color);
 
+	void solve();
+
 private:
 	SudokuSolver solver;
 
@@ -34,4 +37,8 @@ private:
 	sf::Sprite m_resetSprite;
 
 	bool m_loadedFromFile;
+
+	std::set<std::pair<int, int>> m_mistakes;
+
+	bool m_done;
 };
