@@ -10,9 +10,9 @@
 #include <unordered_map>
 
 PlayState::PlayState(StateMachine& machine, sf::RenderWindow& window, bool replace)
-	: State(machine, window, replace), m_loadedFromFile{false}
+	: State(machine, window, replace), m_loadedFromFile{ false }
 {
-	if(!m_mainbgText.loadFromFile("assets/mainbg.png"))
+	if (!m_mainbgText.loadFromFile("assets/mainbg.png"))
 	{
 		std::cout << "\"assets/mainbg.png\" is not exsist\n";
 	}
@@ -21,7 +21,7 @@ PlayState::PlayState(StateMachine& machine, sf::RenderWindow& window, bool repla
 		m_mainbgSprite.setTexture(m_mainbgText);
 	}
 
-	if(!m_pauseText.loadFromFile("assets/pausebutton.png"))
+	if (!m_pauseText.loadFromFile("assets/pausebutton.png"))
 	{
 		std::cout << "\"assets/pausebutton.png\" is not exsist\n";
 	}
@@ -61,7 +61,7 @@ PlayState::PlayState(StateMachine& machine, sf::RenderWindow& window, bool repla
 			cell.shape.setSize(sf::Vector2f(m_window.getSize().x / 15, m_window.getSize().y / 15));
 			cell.shape.setOrigin(sf::Vector2f(cell.shape.getSize().x / 2, cell.shape.getSize().y / 2));
 			cell.shape.setPosition(sf::Vector2f((m_window.getSize().x / 4) + (cell.shape.getSize().x) * x, (m_window.getSize().y / 4) + (cell.shape.getSize().y) * y));
-			
+
 			if (x % 3 == 0)
 				cell.shape.setPosition(sf::Vector2f(cell.shape.getPosition().x + 3.f, cell.shape.getPosition().y));
 			if (y % 3 == 0)
@@ -97,9 +97,9 @@ void PlayState::resume()
 void PlayState::update()
 {
 	sf::Event event;
-	while(m_window.pollEvent(event))
+	while (m_window.pollEvent(event))
 	{
-		if (event.type == sf::Event::KeyPressed) 
+		if (event.type == sf::Event::KeyPressed)
 		{
 			switch (event.key.code)
 			{
@@ -120,7 +120,7 @@ void PlayState::update()
 				m_next = StateMachine::build<MenuState>(m_machine, m_window, false);
 			else if (m_resetSprite.getGlobalBounds().contains(worldPos))
 				reset();
-			
+
 			for (int x = 0; x < ROW; x++)
 			{
 				for (int y = 0; y < COL; y++)
@@ -174,7 +174,7 @@ void PlayState::draw()
 	m_window.draw(m_pauseSprite);
 
 	m_window.draw(m_resetSprite);
-	
+
 	m_window.display();
 }
 
@@ -206,21 +206,21 @@ void PlayState::setColorOfMistakes(int row, int column, sf::Color color)
 
 	for (int x = 0; x < ROW; x++)
 	{
-		if (nums.find(m_machine.m_cells.get()[column * ROW + x].num) != nums.end() && nums.find(m_machine.m_cells.get()[column * ROW + x].num)->second != std::make_pair(x, column))
+		if (nums.find(m_machine.m_cells.get()[column * ROW + x].num) == nums.end() || nums.find(m_machine.m_cells.get()[column * ROW + x].num)->second != std::make_pair(x, column))
 			nums.insert(std::make_pair(m_machine.m_cells.get()[column * ROW + x].num, std::make_pair(x, column)));
 	}
 
 	for (int y = 0; y < COL; y++)
 	{
-		if(nums.find(m_machine.m_cells.get()[y * ROW + row].num) != nums.end() && nums.find(m_machine.m_cells.get()[y * ROW + row].num)->second != std::make_pair(row, y))
+		if (nums.find(m_machine.m_cells.get()[y * ROW + row].num) == nums.end() || nums.find(m_machine.m_cells.get()[y * ROW + row].num)->second != std::make_pair(row, y))
 			nums.insert(std::make_pair(m_machine.m_cells.get()[y * ROW + row].num, std::make_pair(row, y)));
 	}
 
-	for(auto i = nums.begin(); i != nums.end(); i++)
+	for (auto i = nums.begin(); i != nums.end(); i++)
 	{
 		if (i->first != 0 && nums.count(i->first) > 1)
 			m_machine.m_cells.get()[i->second.second * ROW + i->second.first].text.setFillColor(color);
 		else
 			m_machine.m_cells.get()[i->second.second * ROW + i->second.first].text.setFillColor(sf::Color::Black);
-	} 
+	}
 }
